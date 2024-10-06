@@ -1,0 +1,36 @@
+#!/bin/bash 
+
+# This script installs the CodeDeploy agent and its prerequisites on Ubuntu 22.04.  
+
+# Update package list
+sudo apt-get update 
+
+# Install Ruby and its dependencies
+sudo apt-get install ruby-full ruby-webrick wget -y 
+
+# Change to temporary directory
+cd /tmp 
+
+# Download the CodeDeploy agent package
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/releases/codedeploy-agent_1.3.2-1902_all.deb 
+
+# Create a directory to extract the package contents
+mkdir codedeploy-agent_1.3.2-1902_ubuntu22 
+
+# Extract the package contents
+dpkg-deb -R codedeploy-agent_1.3.2-1902_all.deb codedeploy-agent_1.3.2-1902_ubuntu22 
+
+# Update the package dependencies to use Ruby 3.0
+sed 's/Depends:.*/Depends:ruby3.0/' -i ./codedeploy-agent_1.3.2-1902_ubuntu22/DEBIAN/control 
+
+# Repackage the updated package
+dpkg-deb -b codedeploy-agent_1.3.2-1902_ubuntu22/ 
+
+# Install the updated package
+sudo dpkg -i codedeploy-agent_1.3.2-1902_ubuntu22.deb 
+
+# List all systemd units that contain "codedeploy" in their name
+systemctl list-units --type=service | grep codedeploy 
+
+# Check the status of the CodeDeploy agent service
+sudo service codedeploy-agent status

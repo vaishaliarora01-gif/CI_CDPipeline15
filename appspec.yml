@@ -5,7 +5,7 @@ files:
     destination: /var/www/html
 hooks:
   BeforeInstall:  # This ensures the previous file is removed before deployment
-    - location: scripts/cleanup.sh
+    - location: cleanup.sh
       timeout: 300
       runas: root
 
